@@ -27,12 +27,9 @@ import logging
 import time
 import urllib.request, urllib.parse, urllib.error
 import codecs
-import ssl
 import os
 from enum import IntEnum
 from socket import error as SocketError
-
-from . import data
 
 HTTP_TIMEOUT = 30
 USER_AGENT = 'pithos'
@@ -259,13 +256,10 @@ class Pandora:
     def build_opener(*handlers):
         """Creates a new opener
 
-        Wrapper around urllib.request.build_opener() that adds
-        a custom ssl.SSLContext for use with internal-tuner.pandora.com
+        Wrapper around urllib.request.build_opener(); TLS is verified
+        against the system trust store
         """
-        ctx = ssl.create_default_context()
-        ctx.load_verify_locations(cadata=data.internal_cert)
-        https = urllib.request.HTTPSHandler(context=ctx)
-        return urllib.request.build_opener(https, *handlers)
+        return urllib.request.build_opener(*handlers)
 
     def set_url_opener(self, opener):
         self.opener = opener
